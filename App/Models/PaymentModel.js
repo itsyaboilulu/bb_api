@@ -2,48 +2,44 @@ const { DataTypes } = require("sequelize");
 const { ModelColumn } = require("../Helpers/ModelHelper.js");
 const ModelBuilder = require("./../Databases/ModelBuilder.js");
 
-class PotModel extends require('./../Databases/Model.js') {
+class PaymentModel extends require('./../Databases/Model.js') {
     constructor(){
         super();
 
-        this.table = 'pot';
-        this.primaryKey = 'pot_id';
+        this.table = 'payments';
+        this.primaryKey = 'payment_id';
 
         this.columns = {
-            pot_id: {
+            payment_id: {
                 ...ModelColumn,
                 autoIncrement: true,
                 primaryKey: true
             },
-            pot_amount: {
+            payment_reference: {
+                ...ModelColumn,
+                type: DataTypes.TEXT
+            },
+            payment_type: {
+                ...ModelColumn,
+                type: DataTypes.TEXT
+            },
+            payment_amount: {
                 ...ModelColumn,
                 type: DataTypes.DECIMAL
             },
-            pot_status: {
-                ...ModelColumn,
-                type: DataTypes.TEXT
-            },
-            pot_created_by: {
+            payment_payee: {
                 ...ModelColumn,
                 type: DataTypes.INTEGER
             },
-            pot_created_for: {
-                ...ModelColumn,
-                type: DataTypes.INTEGER
-            },
-            pot_created_datetime: {
+            payment_notes: {
                 ...ModelColumn,
                 type: DataTypes.TEXT
             },
-            pot_datetime: {
+            payment_date: {
                 ...ModelColumn,
                 type: DataTypes.TEXT
             },
-            pot_reason_id: {
-                ...ModelColumn,
-                type: DataTypes.INTEGER
-            },
-            pot_notes: {
+            payment_datetime: {
                 ...ModelColumn,
                 type: DataTypes.TEXT
             },
@@ -55,19 +51,11 @@ class PotModel extends require('./../Databases/Model.js') {
         return this.hasOne(
             'UserModel',
             'user_id',
-            'pot_created_for',
-        ) 
-    }
-
-    reason(){
-        return this.hasOne(
-            'ReasonsModel',
-            'reason_id',
-            'pot_reason_id',
+            'payment_payee',
         ) 
     }
 
 }
 
-module.exports = (sequelize=null) => new ModelBuilder(new PotModel(), sequelize)
+module.exports = (sequelize=null) => new ModelBuilder(new PaymentModel(), sequelize)
 

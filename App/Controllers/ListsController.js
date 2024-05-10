@@ -1,6 +1,8 @@
 const Models = require("../Databases/Models.js");
 const _ = require("lodash");
 
+const DiceByType = require("../Engines/Dice/DiceByType.js");
+
 class ListsController {
 
     async getUsers(req, res) {
@@ -24,6 +26,10 @@ class ListsController {
                 icon: i.reason_icon
             }))
         );
+    }
+
+    async getDice(req, res) {
+        res.json(await DiceByType())
     }
 }
 

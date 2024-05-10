@@ -1,12 +1,12 @@
 const Sequelize = require("sequelize");
-const Constants = require("../../constants.js");
 const _ = require("lodash");
 const { ModelProps } = require("../Helpers/ModelHelper.js");
 const { Op } = require("sequelize");
 const getDatabase = require("./getDatabase.js");
 
 const camparitorToOp = {
-    '=': Op.eq
+    '=': Op.eq,
+    '!=': Op.ne
 }
 
 module.exports = class ModelBuilder {
@@ -115,6 +115,32 @@ module.exports = class ModelBuilder {
         } else {
             let column = where[0];
             let comparaitor = where[2] ? camparitorToOp[where[1]] : camparitorToOp['=']
+            let value = where[2] || where[1];
+
+            this.modelProps = {
+                ...this.modelProps,
+                where: {
+                    ...(this.props?.where || []),
+                    [Op.and] : {
+                        ...(this.props?.where[Op.and] || []),
+                        [column]: {
+                            [comparaitor]: value
+                        }
+                    }
+                }
+            }
+        }
+        return this
+    }
+
+    whereNot = function(...where) {
+        if (_.isObject(where[0])){
+            _.each(_.keys(where[0]), function(k){
+                this.where(k, where[0][k])
+            });
+        } else {
+            let column = where[0];
+            let comparaitor = camparitorToOp['!=']
             let value = where[2] || where[1];
 
             this.modelProps = {
@@ -258,7 +284,7 @@ module.exports = class ModelBuilder {
 
     #hasMany = async function({ model, foreignKey, localkey=this.childModel.primaryKey, alias }, f=null) {
         if (!_.find(this.modelProps?.include, {as: alias})){
-            let _model = require(`./${model}.js`)(this.sequelize);
+            let _model = require(`./../Models/${model}.js`)(this.sequelize);
             this.model.hasMany(
                 _model.getModel(),
                 {foreignKey: foreignKey, sourceKey:localkey, as: alias}
@@ -282,7 +308,7 @@ module.exports = class ModelBuilder {
 
     #hasOne = async function({ model, foreignKey, localkey=this.childModel.primaryKey, alias }, f=null) {
         if (!_.find(this.modelProps?.include, {as: alias})){
-            let _model = require(`./${model}.js`)(this.sequelize);
+            let _model = require(`./../Models/${model}.js`)(this.sequelize);
             this.model.hasOne(
                 _model.getModel(),
                 {foreignKey: foreignKey, sourceKey:localkey, as: alias}

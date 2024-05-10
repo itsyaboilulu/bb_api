@@ -1,24 +1,22 @@
 const moment = require("moment");
 const Models = require("../Databases/Models.js");
 
+const _ = require("lodash");
+
+//engins
+const AllTransactions = require('../Engines/Transactions/AllTransactions.js')
+
 class BankController {
 
     async getBank(req, res) {
-        let PotModel = Models.getModel('PotModel');
-
-        let transactions = await PotModel.get();
-
-        let ret = {
-            bank: {
-                total: 0,
-                paid: 0,
-                debt: 0,
-            },
-            transactions: transactions,
-            staff: req.loggedInUser,
-        }
-
-        res.json(ret);
+        let transactions = await AllTransactions();
+        console.log(transactions)
+        res.json(
+            _.orderBy(
+                transactions,
+                ['date'], ['desc']
+            )
+        );
     }
     
 
@@ -43,7 +41,7 @@ class BankController {
         let PotModel = Models.getModel('PotModel');
         PotModel.create({
             pot_amount: pot,
-            pot_status: 'debt',
+            pot_status: 'Debit',
             pot_created_by: user.i,
             pot_created_for: payee,
             pot_created_datetime: moment().format('YYYY-MM-DD HH:mm:ss'),

@@ -23,7 +23,7 @@ class AuthController {
     //         let newUser = await userModel.create({
     //             user_username: username,
     //             user_password: await AuthHelper.hashPassword(password),
-    //             user_access_type: 'friend'
+    //             user_access_type: 'BB'
     //         })
     //         res.json({
     //             success: true,
